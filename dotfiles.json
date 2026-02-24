@@ -1,0 +1,7 @@
+{
+  "links": [
+    { "src": "nvim", "dst": "~/.config/nvim" },
+    { "src": "zsh/.zshrc", "dst": "~/.zshrc" }
+  ]
+}
+

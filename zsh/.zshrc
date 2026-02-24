@@ -130,11 +130,16 @@ export PATH="$PATH:/Users/aziz/dev/automation/scripts"
 
 # Java Verisons
 alias javas="/usr/libexec/java_home --verbose"
-alias java21="export JAVA_HOME=`/usr/libexec/java_home -v 21`"
-alias java17="export JAVA_HOME=`/usr/libexec/java_home -v 17`"
-alias java11="export JAVA_HOME=`/usr/libexec/java_home -v 11`"
-alias java8="export JAVA_HOME=`/usr/libexec/java_home -v 1.8`"
-java21
+jset() {
+  export JAVA_HOME="$(/usr/libexec/java_home -v "$1")" || return 1
+  echo "JAVA_HOME=$JAVA_HOME"
+  java -version
+}
+
+alias java25='jset 25'
+alias java21='jset 21'
+alias java17='jset 17'
+alias java11='jset 11'
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
