@@ -158,63 +158,49 @@ return {
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
       --    function will be executed to configure the current buffer
       vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+        group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
         callback = function(event)
-          -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-          -- to define small helper and utility functions so you don't have to repeat yourself.
-          --
           -- In this case, we create a function that lets us more easily define mappings specific
           -- for LSP related items. It sets the mode, buffer and description for us each time.
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+            desc = desc or ''
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = desc })
           end
 
-          -- Jump to the definition of the word under your cursor.
-          --  This is where a variable was first declared, or where a function is defined, etc.
-          --  To jump back, press <C-t>.
+          -- {
+          --   add_workspace_folder = <function 1>,
+          --   clear_references = <function 2>,
+          --   code_action = <function 3>,
+          --   completion = <function 4>,
+          --   declaration = <function 5>,
+          --   definition = <function 6>,
+          --   document_highlight = <function 7>,
+          --   document_symbol = <function 8>,
+          --   execute_command = <function 9>,
+          --   format = <function 10>,
+          --   hover = <function 11>,
+          --   implementation = <function 12>,
+          --   incoming_calls = <function 13>,
+          --   list_workspace_folders = <function 14>,
+          --   outgoing_calls = <function 15>,
+          --   references = <function 16>,
+          --   remove_workspace_folder = <function 17>,
+          --   rename = <function 18>,
+          --   signature_help = <function 19>,
+          --   type_definition = <function 20>,
+          --   typehierarchy = <function 21>,
+          --   workspace_symbol = <function 22>
+          -- }
+
           map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-
-          -- Find references for the word under your cursor.
-          map('gr', vim.lsp.buf.references, '[G]oto [R]eferences')
-
-          -- Jump to the implementation of the word under your cursor.
-          --  Useful when your language has ways of declaring types without an actual implementation.
-          map('gi', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
-
-          map('gy', vim.lsp.buf.type_definition, '[G]oto T[y]pe Definition')
-
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
-          map('<leader>cr', vim.lsp.buf.rename, '[R]ename')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'v', 'x' })
-          vim.keymap.set(
-            'v',
-            '<space>ca',
-            '<ESC><CMD>lua vim.lsp.buf.range_code_action()<CR>',
-            { noremap = true, silent = true, buffer = bufnr, desc = 'Code actions' }
-          )
-
-          -- Fuzzy find all the symbols in your current document.
-          --  Symbols are things like variables, functions, types, etc.
-          map('<leader>cs', vim.lsp.buf.document_symbol, 'Open Document [S]ymbols')
-
-          -- Fuzzy find all the symbols in your current workspace.
-          --  Similar to document symbols, except searches over your entire project.
-          map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open [W]orkspace [S]ymbols')
-
-          map('<space>wa', vim.lsp.buf.add_workspace_folder, '[A]dd [W]orkspace folder')
-          map('<space>wr', vim.lsp.buf.remove_workspace_folder, '[R]emove [W]orkspace folder')
-          map('<space>wl', function()
-            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-          end, '[L]ist [W]orkspace folders')
+          map('gi', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
+          map('gr', vim.lsp.buf.references, '[G]oto [R]eferences')
+          map('gy', vim.lsp.buf.type_definition, '[G]oto T[y]pe Definition')
+          map('<leader>ci', vim.lsp.buf.incoming_calls, '[I]ncoming Calls')
+          map('<leader>co', vim.lsp.buf.outgoing_calls, '[O]utgoing Calls')
+          map('<leader>ct', vim.lsp.buf.typehierarchy, '[T]ype Hierarchy')
 
           map('K', function()
             return vim.lsp.buf.hover()
@@ -226,13 +212,19 @@ return {
             return vim.lsp.buf.signature_help()
           end, 'Signature Help', { 'i' })
 
-          -- TODO: extract var, method, etc. tools
+          map('<leader>cr', vim.lsp.buf.rename, '[R]ename Symbol')
+          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'v', 'x' })
 
-          -- map("<leader>cc", vim.lsp.codelens.run, "Run Codelens", { "n", "v" })
-          -- map("<leader>cC", vim.lsp.codelens.refresh, "Refresh & Display Codelens", { "n" })
-          -- map("<leader>cR", function() Snacks.rename.rename_file() end, "Rename File", { "n" })
-          -- map("<leader>cr", vim.lsp.buf.rename, "Rename", { has = "rename" })
-          -- map("<leader>cA", LazyVim.lsp.action.source, "Source Action", { has = "codeAction" })
+          map('<leader>cs', vim.lsp.buf.document_symbol, 'Open Document [S]ymbols')
+          map('<leader>ps', vim.lsp.buf.workspace_symbol, 'Open [W]orkspace [S]ymbols')
+
+          map('<space>pa', vim.lsp.buf.add_workspace_folder, '[A]dd Workspace folder')
+          map('<space>pr', vim.lsp.buf.remove_workspace_folder, '[R]emove Workspace folder')
+          map('<space>pl', function()
+            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+          end, '[L]ist workspace folders')
+
+          -- TODO: extract var, method, etc. tools
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -254,7 +246,7 @@ return {
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
-            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+            local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
               group = highlight_augroup,
@@ -268,10 +260,10 @@ return {
             })
 
             vim.api.nvim_create_autocmd('LspDetach', {
-              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+              group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
               callback = function(event2)
                 vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+                vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
               end,
             })
           end
@@ -283,12 +275,7 @@ return {
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>ch', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, 'Toggle Inlay [H]ints')
-          end
-
-          -- custom clangd extensions
-          if client and client.name == 'clangd' then
-            map('<leader>cc', '<cmd>ClangdSwitchSourceHeader<cr>', 'Switch source/header')
+            end, 'Toggle Inlay Hints')
           end
         end,
       })
@@ -393,7 +380,7 @@ return {
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
-        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+        ensure_installed = {}, -- explicitly set to an empty table
         automatic_installation = false,
         automatic_enable = true,
         handlers = {

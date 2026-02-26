@@ -49,7 +49,7 @@ return { -- Useful plugin to show you pending keybinds.
       { '<leader>c', group = 'code' },
       { '<leader>w', group = 'window' },
       { '<leader>b', group = 'buffer' },
-      { '<leader>t', group = 'toggle' },
+      { '<leader>p', group = 'workspace' },
       { 'g', group = 'goto' },
     },
   },

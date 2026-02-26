@@ -221,8 +221,8 @@ return {
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,
-        mode = '',
-        desc = '[F]ormat',
+        mode = { 'n', 'x' },
+        desc = '[F]ormat Code/Selection',
       },
     },
     opts = {

@@ -3,9 +3,6 @@ local opts = { noremap = true, silent = true }
 -- Clear highlights on search when pressing <Esc> in normal mode
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- Diagnostic keymaps
-vim.keymap.set('n', '<leader>dq', vim.diagnostic.setloclist, { desc = 'Open [D]iagnostic [Q]uickfix list' })
-
 -- better up/down
 
 vim.keymap.set('i', '<C-c>', '<Esc>')
@@ -42,7 +39,7 @@ vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
   end,
@@ -68,3 +65,14 @@ vim.keymap.set('n', '<S-Tab>', '<cmd>bprevious<cr>', { silent = true, desc = 'Pr
 vim.keymap.set('n', '<leader>e', vim.cmd.Ex, { desc = 'Open [E]xplorer' })
 vim.keymap.set('n', '<leader>we', ':Vexplore<CR>', { desc = 'Open V[e]xplorer [W]indow' })
 
+-- Terminal
+vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+
+-- Diagnostics
+vim.keymap.set('n', '<leader>cd', function()
+  if vim.diagnostic.is_enabled() then
+    vim.diagnostic.enable(false)
+  else
+    vim.diagnostic.enable()
+  end
+end, { desc = 'Toggle [D]iagnostics' })

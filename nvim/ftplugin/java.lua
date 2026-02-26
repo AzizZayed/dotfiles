@@ -40,15 +40,15 @@ local on_attach = function(client, bufnr)
   local bufopts = { noremap = true, silent = true, buffer = bufnr }
 
   -- Java extensions provided by jdtls
-  nnoremap('<C-o>', jdtls.organize_imports, bufopts, 'Organize imports')
-  nnoremap('<leader>cev', jdtls.extract_variable, bufopts, '[E]xtract [V]ariable')
-  nnoremap('<leader>cec', jdtls.extract_constant, bufopts, '[E]xtract [C]onstant')
-  vim.keymap.set(
-    'v',
-    '<leader>cem',
-    [[<ESC><CMD>lua require('jdtls').extract_method(true)<CR>]],
-    { noremap = true, silent = true, buffer = bufnr, desc = '[E]xtract [M]ethod' }
-  )
+  -- nnoremap('<C-o>', jdtls.organize_imports, bufopts, 'Organize imports')
+  -- nnoremap('<leader>cev', jdtls.extract_variable, bufopts, '[E]xtract [V]ariable')
+  -- nnoremap('<leader>cec', jdtls.extract_constant, bufopts, '[E]xtract [C]onstant')
+  -- vim.keymap.set(
+  --   'v',
+  --   '<leader>cem',
+  --   [[<ESC><CMD>lua require('jdtls').extract_method(true)<CR>]],
+  --   { noremap = true, silent = true, buffer = bufnr, desc = '[E]xtract [M]ethod' }
+  -- )
 end
 
 local config = {
