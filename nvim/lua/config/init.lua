@@ -1,12 +1,16 @@
-require("config.options")
-require("config.remap")
-require("config.lazy")
-require("config.health")
+require 'config.options'
+require 'config.remap'
+require 'config.lazy'
+require 'config.health'
+require 'config.netrw'
 
-vim.filetype.add({
+local utils = require 'utils'
+
+vim.filetype.add {
   pattern = {
-    ['.*%.h%.inc']   = 'cpp',  -- or 'c' if you prefer
+    ['.*%.h%.inc'] = 'cpp', -- or 'c' if you prefer
     ['.*%.cpp%.inc'] = 'cpp',
   },
-})
+}
+
 

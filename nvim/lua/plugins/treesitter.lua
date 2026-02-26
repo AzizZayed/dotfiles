@@ -26,6 +26,7 @@ return {
         'java',
         'cpp',
         'python',
+        'rust',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,

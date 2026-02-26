@@ -72,6 +72,7 @@ return {
   {
     'rmagatti/auto-session',
     lazy = false,
+    -- enabled = false,
 
     ---enables autocomplete for opts
     ---@module "auto-session"
@@ -267,7 +268,7 @@ return {
     config = function()
       local lint = require 'lint'
       lint.linters_by_ft = {
-        markdown = { 'markdownlint' },
+        -- markdown = { 'markdownlint' },
         cpp = { 'clangtidy' },
         c = { 'clangtidy' },
         java = { 'checkstyle' },
