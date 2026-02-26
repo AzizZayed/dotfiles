@@ -5,10 +5,10 @@ return {
     lazy = false,
     ---@type snacks.Config
     opts = {
-      bigfile = { enabled = true }, -- Disable features when opening large files
-      bufdelete = { enabled = true }, -- Delete buffers without disrupting window layout.
-      dim = { enabled = true }, -- Dim all except active scope
-      gitbrowse = { enabled = true }, -- Open current file in git remote repo
+      bigfile = { enabled = true },
+      bufdelete = { enabled = true },
+      dim = { enabled = true },
+      gitbrowse = { enabled = true },
       notifier = {
         enabled = true,
         timeout = 3000,
@@ -26,27 +26,19 @@ return {
       quickfile = { enabled = true },
     },
     keys = {
-      -- Other
-      {
-        '<leader>bd',
-        function()
-          Snacks.dim()
-        end,
-        desc = 'Toggle [D]imming',
-      },
-      {
-        '<leader>n',
-        function()
-          Snacks.notifier.show_history()
-        end,
-        desc = '[N]otification History',
-      },
       {
         '<leader>bd',
         function()
           Snacks.bufdelete.delete()
         end,
-        desc = '[D]elete [B]uffer',
+        desc = '[D]elete Buffer',
+      },
+      {
+        '<leader>bD',
+        function()
+          Snacks.dim()
+        end,
+        desc = 'Toggle [D]imming',
       },
       {
         '<leader>br',
@@ -62,6 +54,13 @@ return {
         end,
         desc = '[G]it Browse',
         mode = { 'n', 'v' },
+      },
+      {
+        '<leader>n',
+        function()
+          Snacks.notifier.show_history()
+        end,
+        desc = '[N]otification History',
       },
     },
   },
