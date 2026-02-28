@@ -6,7 +6,6 @@ return {
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs',
     opts = function()
       return {
         ensure_installed = require('languages').languages(),
@@ -17,6 +16,15 @@ return {
           additional_vim_regex_highlighting = { 'ruby' },
         },
         indent = { enable = true, disable = { 'ruby' } },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = '<C-space>',
+            node_incremental = '<C-space>',
+            -- scope_incremental = false,
+            node_decremental = '<C-backspace>',
+          },
+        },
       }
     end,
   },

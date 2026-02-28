@@ -3,16 +3,16 @@
 -- ft keys double as treesitter parser names.
 
 ---@class LanguageConfig
----@field lsp? string                LSP server name (configured in M.servers)
+---@field lsps? string[]             LSP server names (configured in M.servers)
 ---@field formatters? string[]       Formatter names, chained in order (conform.nvim)
 ---@field linters? string[]          Linter names (nvim-lint)
 ---@field format_on_save? boolean    Format on save (default: true)
 
 ---@class LanguageServerConfig
----@field cmd? string[]
----@field filetypes? string[]
----@field settings? table
----@field capabilities? table
+---@field cmd? string[]              Command to start the LSP server
+---@field filetypes? string[]        Filetypes the server should attach to (overrides ft in M.langs)
+---@field settings? table            LSP-specific settings table (passed to lspconfig)
+---@field capabilities? table        LSP capabilities (passed to lspconfig)
 
 local M = {
   -- LSP server configs keyed by lspconfig server name.
@@ -29,28 +29,29 @@ local M = {
     lua_ls = {
       settings = { Lua = { completion = { callSnippet = 'Replace' } } },
     },
+    emmylua_ls = {},
   },
 
   -- Per-filetype tooling. Keys are also treesitter parser names.
   ---@type table<string, LanguageConfig>
   langs = {
     c = {
-      lsp = 'clangd',
+      lsps = { 'clangd' },
       formatters = { 'clang-format' },
       linters = { 'clangtidy' },
     },
     cpp = {
-      lsp = 'clangd',
+      lsps = { 'clangd' },
       formatters = { 'clang-format' },
       linters = { 'clangtidy' },
     },
     python = {
-      lsp = 'pyright',
+      lsps = { 'pyright' },
       formatters = { 'black' },
       linters = { 'ruff' },
     },
     rust = {
-      lsp = 'rust_analyzer',
+      lsps = { 'rust_analyzer' },
       formatters = { 'rustfmt' },
       linters = { 'clippy' },
     },
@@ -60,11 +61,11 @@ local M = {
       linters = { 'checkstyle' },
     },
     lua = {
-      lsp = 'lua_ls',
+      lsps = { 'lua_ls', 'emmylua_ls' },
       formatters = { 'stylua' },
     },
     vhdl = {
-      lsp = 'vhdl_ls',
+      lsps = { 'vhdl_ls' },
     },
     markdown = {
       formatters = { 'prettier' },
@@ -74,6 +75,8 @@ local M = {
     dockerfile = { linters = { 'hadolint' } },
   },
 }
+
+M.servers['lua-language-server'] = M.servers.lua_ls -- mason-lspconfig name
 
 -- ---------------------------------------------------------------------------
 -- Helpers
