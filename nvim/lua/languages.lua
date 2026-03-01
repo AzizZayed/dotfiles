@@ -51,8 +51,8 @@ local M = {
       linters = { 'ruff' },
     },
     rust = {
-      lsps = { 'rust_analyzer' },
-      formatters = { 'rustfmt' },
+      lsps = { 'rust-analyzer' },
+      -- formatters = { 'rustfmt' },
       linters = { 'clippy' },
     },
     java = {
@@ -77,6 +77,7 @@ local M = {
 }
 
 M.servers['lua-language-server'] = M.servers.lua_ls -- mason-lspconfig name
+M.servers['rust-analyzer'] = M.servers['rust_analyzer'] -- mason-lspconfig name
 
 -- ---------------------------------------------------------------------------
 -- Helpers
