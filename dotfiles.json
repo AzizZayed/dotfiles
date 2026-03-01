@@ -2,7 +2,8 @@
   "links": [
     { "src": "nvim", "dst": "~/.config/nvim" },
     { "src": "zsh/.zshrc", "dst": "~/.zshrc" },
-    { "src": "tmux/.tmux.conf", "dst": "~/.tmux.conf" }
+    { "src": "tmux/.tmux.conf", "dst": "~/.tmux.conf" },
+    { "src": "kitty", "dst": "~/.config/kitty" }
   ]
 }
 

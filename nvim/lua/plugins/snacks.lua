@@ -24,6 +24,12 @@ return {
         top_down = false,
       },
       quickfile = { enabled = true },
+      terminal = {
+        enabled = true,
+        keys = {
+          mode = 'n',
+        },
+      },
     },
     keys = {
       {
@@ -61,6 +67,13 @@ return {
           Snacks.notifier.show_history()
         end,
         desc = '[N]otification History',
+      },
+      {
+        '<leader>tt',
+        function()
+          Snacks.terminal()
+        end,
+        desc = 'Toggle Terminal',
       },
     },
   },

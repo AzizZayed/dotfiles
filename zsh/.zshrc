@@ -128,6 +128,9 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # Add tester scripts to path
 export PATH="$PATH:/Users/aziz/dev/automation/scripts"
 
+# Kitty terminal binaries (kitten, etc.)
+export PATH="$PATH:/Applications/kitty.app/Contents/MacOS"
+
 # Java Verisons
 alias javas="/usr/libexec/java_home --verbose"
 jset() {

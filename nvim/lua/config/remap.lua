@@ -66,7 +66,8 @@ vim.keymap.set('n', '<leader>e', vim.cmd.Ex, { desc = 'Open [E]xplorer' })
 vim.keymap.set('n', '<leader>we', ':Vexplore<CR>', { desc = 'Open V[e]xplorer [W]indow' })
 
 -- Terminal
-vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+-- vim.keymap.set('t', '<Esc>', '<Esc>')
+vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- Diagnostics
 vim.keymap.set('n', '<leader>cd', function()
