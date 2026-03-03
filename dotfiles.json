@@ -3,7 +3,8 @@
     { "src": "nvim", "dst": "~/.config/nvim" },
     { "src": "zsh/.zshrc", "dst": "~/.zshrc" },
     { "src": "tmux/.tmux.conf", "dst": "~/.tmux.conf" },
-    { "src": "kitty", "dst": "~/.config/kitty" }
+    { "src": "kitty", "dst": "~/.config/kitty" },
+    { "src": "starship.toml", "dst": "~/.config/starship.toml" }
   ]
 }
 
