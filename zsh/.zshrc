@@ -14,9 +14,11 @@ export EDITOR='nvim'
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 
-rm () {
-    echo "Use trash instead of rm"
-}
+if [[ $(uname) == "Darwin" ]]; then
+    rm () {
+        echo "Use trash instead of rm"
+    }
+fi
 
 # C/C++
 export SDKROOT=$(xcrun -show-sdk-path)
@@ -55,9 +57,6 @@ PATH="$PATH:/opt/homebrew/opt/ccache/libexec"
 
 # Created by `pipx` on 2024-09-05 00:33:25
 export PATH="$PATH:/Users/aziz/.local/bin"
-
-# opam
-eval $(opam env)
 
 [ -f "/Users/aziz/.ghcup/env" ] && . "/Users/aziz/.ghcup/env" # ghcup-env
 

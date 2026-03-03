@@ -4,7 +4,8 @@
     { "src": "zsh/.zshrc", "dst": "~/.zshrc" },
     { "src": "tmux/.tmux.conf", "dst": "~/.tmux.conf" },
     { "src": "kitty", "dst": "~/.config/kitty" },
-    { "src": "starship.toml", "dst": "~/.config/starship.toml" }
+    { "src": "starship.toml", "dst": "~/.config/starship.toml" },
+    { "src": "fish/config.fish", "dst": "~/.config/fish/config.fish" }
   ]
 }
 
