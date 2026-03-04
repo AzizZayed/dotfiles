@@ -58,6 +58,16 @@ return {
   },
 
   {
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    build = 'cd app && yarn install',
+    init = function()
+      vim.g.mkdp_filetypes = { 'markdown' }
+    end,
+    ft = { 'markdown' },
+  },
+
+  {
     'lervag/vimtex',
     ft = { 'tex', 'plaintex' },
     tag = 'v2.16',
