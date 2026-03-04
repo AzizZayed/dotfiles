@@ -6,6 +6,8 @@ export LANG=en_US.UTF-8
 # Preferred editor for local and remote sessions
 export EDITOR='nvim'
 
+export XDG_CONFIG_HOME="$HOME/.config"
+
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
@@ -16,7 +18,7 @@ export EDITOR='nvim'
 
 if [[ $(uname) == "Darwin" ]]; then
     rm () {
-        echo "Use trash instead of rm"
+        echo "zsh: use trash instead of rm"
     }
 fi
 
