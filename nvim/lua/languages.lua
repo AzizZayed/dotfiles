@@ -69,7 +69,7 @@ local M = {
     },
     markdown = {
       formatters = { 'prettier' },
-      linters = { 'markdownlint' },
+      -- linters = { 'markdownlint' },
     },
     json = { linters = { 'jsonlint' } },
     dockerfile = { linters = { 'hadolint' } },

@@ -1,6 +1,11 @@
 return {
   { 'nvim-lua/plenary.nvim' },
   {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    opts = {},
+  },
+  {
     'christoomey/vim-tmux-navigator',
     lazy = false,
     cmd = {

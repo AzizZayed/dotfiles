@@ -5,8 +5,9 @@ vim.g.have_nerd_font = true
 
 vim.opt.guicursor = {
   'n-v-c:block-Cursor/lCursor',
-  'i-ci-ve-t:ver25-Cursor/lCursor',
+  'i-ci-ve:ver25-Cursor/lCursor',
   'r-cr-o:hor20-Cursor/lCursor',
+  't:ver25-Cursor/lCursor',
 }
 
 vim.o.number = true
