@@ -1,12 +1,13 @@
 {
   "links": [
-    { "src": "nvim", "dst": "~/.config/nvim" },
+    { "src": "bash/.bashrc", "dst": "~/.bashrc" },
     { "src": "zsh/.zshrc", "dst": "~/.zshrc" },
+    { "src": "fish/config.fish", "dst": "~/.config/fish/config.fish" },
+    { "src": "nushell/config.nu", "dst": "~/.config/nushell/config.nu" },
+    { "src": "nvim", "dst": "~/.config/nvim" },
     { "src": "tmux/.tmux.conf", "dst": "~/.tmux.conf" },
     { "src": "kitty", "dst": "~/.config/kitty" },
-    { "src": "starship.toml", "dst": "~/.config/starship.toml" },
-    { "src": "fish/config.fish", "dst": "~/.config/fish/config.fish" },
-    { "src": "nushell/config.nu", "dst": "~/.config/nushell/config.nu" }
+    { "src": "starship.toml", "dst": "~/.config/starship.toml" }
   ]
 }
 

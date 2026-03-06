@@ -37,3 +37,8 @@ end
 if status is-interactive
     starship init fish | source
 end
+
+# neofetch on startup
+if status is-interactive
+    neofetch
+end
