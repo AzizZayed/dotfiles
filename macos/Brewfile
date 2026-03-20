@@ -1,16 +1,91 @@
-brew "tree"
+# Taps
+tap "adoptopenjdk/openjdk"
+
+# Shell & Terminal
 brew "bash"
 brew "fish"
-brew "htop"
-brew "make"
-brew "neofetch"
-brew "neovim"
-brew "ninja"
 brew "nushell"
+brew "zsh"
 brew "starship"
 brew "tmux"
+
+# Editors & Viewers
+brew "neovim"
+brew "tree-sitter"
 brew "tree-sitter-cli"
+
+# Development Tools
+brew "make"
+brew "cmake"
+brew "gcc"
+brew "llvm"
+brew "ninja"
+
+# Build Systems & Languages
+brew "lua"
+brew "luarocks"
+brew "node"
+brew "python@3.12"
+brew "yarn"
+
+# CLI Utilities
+brew "htop"
+brew "jq"
+brew "neofetch"
+brew "tree"
 brew "wget"
-brew "zlib"
-brew "zsh"
+
+# Misc
+brew "ffmpeg"
+brew "openssl@3"
+brew "graphviz"
+
+# Fonts
 cask "font-hack-nerd-font"
+
+# Productivity
+cask "raycast"
+cask "slack"
+cask "whatsapp"
+cask "zoom"
+
+# Development
+cask "docker"
+cask "visual-studio-code"
+cask "termius"
+
+# Terminals
+cask "iterm2"
+cask "kitty"
+
+# Browsers & VPN
+cask "microsoft-edge"
+cask "protonvpn"
+cask "tailscale"
+cask "tor-browser"
+
+# Media & Design
+cask "blender"
+cask "imageoptim"
+cask "skim"
+
+cask "openscad"
+
+# File Management
+cask "appcleaner"
+
+# System Utilities
+cask "betterdisplay"
+cask "latest"
+cask "logi-options+"
+cask "onyx"
+
+# Gaming
+cask "minecraft"
+
+# Mac App Store
+mas "Apple Configurator 2",            id: 1037126344
+mas "Blackmagic Disk Speed Test",      id: 425264550
+mas "Find Any File",                   id: 1001349074
+mas "Unzip - RAR ZIP 7Z Unarchiver",   id: 1537553159
+mas "Xcode",                           id: 497799835

@@ -1,38 +1,45 @@
 #!/bin/bash
+set -euo pipefail
 
-# Exit with error if not on macOS
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# macOS check
 if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "Error: This setup script is intended for macOS only."
+  echo "Error: This script is for macOS only." >&2
   exit 1
 fi
 
-# Install Homebrew if not already installed
-if ! command -v brew &> /dev/null; then
-  echo "Homebrew not found. Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-else
-  echo "Homebrew is already installed."
+# Xcode Command Line Tools
+if ! xcode-select -p &>/dev/null; then
+  echo "Installing Xcode Command Line Tools..."
+  xcode-select --install
+  echo "Re-run this script after the Xcode CLT installation completes."
+  exit 0
 fi
 
-# Code editor and environment
-echo "Installing code editor and environment..."
-brew install neovim tmux tree-sitter tree-sitter-cli
+# Homebrew
+if ! command -v brew &>/dev/null; then
+  echo "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Terminal and shell
-echo "Installing terminal and shell packages..."
-brew install bash fish nushell kitty starship neofetch
+  # Add brew to PATH for the rest of this script (Apple Silicon)
+  if [[ -f /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+fi
 
-# Development tools
-echo "Installing development tools..."
-brew install git make cmake
-
-# Other utilities
-echo "Installing other utilities..."
-brew install wget tree
-brew install --cask font-hack-nerd-font
+# Packages & Apps
+echo "Installing packages from Brewfile..."
+brew bundle --file="$SCRIPT_DIR/Brewfile"
 
 # Cleanup
-echo "Cleaning up Homebrew..."
 brew cleanup
 
-echo "Done!"
+echo ""
+echo "Done! A few apps require manual installation:"
+echo "  - Cisco Secure Client  (corporate VPN — download from IT)"
+echo "  - XP-Pen tablet driver (xp-pen.com)"
+echo "  - FileZilla            (filezilla-project.org)"
+echo "  - TinkerTool           (bresink.com/osx/TinkerTool.html)"
+echo "  - EjectBar             (check Mac App Store)"
+echo "  - Disk Expert          (check Mac App Store)"
