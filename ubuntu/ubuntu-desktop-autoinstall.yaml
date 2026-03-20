@@ -6,9 +6,6 @@ autoinstall:
   version: 1 # version is an Autoinstall required field.
   updates: security
 
-  interactive-sections:
-    - storage
-
   refresh-installer:
     update: yes
 
@@ -58,6 +55,13 @@ autoinstall:
         match:
           name: "en*"
         dhcp4: true
+
+  storage:
+    layout:
+      name: direct
+      match:
+        ssd: true
+        size: largest
 
   ssh:
     install-server: true # you're using this as a server too
