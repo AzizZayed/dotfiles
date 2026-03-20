@@ -9,9 +9,6 @@ autoinstall:
   interactive-sections:
     - storage
 
-  refresh-installer:
-    update: yes
-
   apt:
     geoip: true
     mirror-selection:
