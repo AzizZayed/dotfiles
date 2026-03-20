@@ -9,6 +9,9 @@ autoinstall:
   interactive-sections:
     - storage
 
+  refresh-installer:
+    update: yes
+
   apt:
     geoip: true
     mirror-selection:
@@ -71,12 +74,6 @@ autoinstall:
       sed -i /etc/default/grub -e
       's/GRUB_CMDLINE_LINUX_DEFAULT=".*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/'
     - curtin in-target -- update-grub
-
-    # Let NetworkManager handle network
-    - rm /target/etc/netplan/00-installer-config*yaml
-    - >-
-      printf "network:\n  version: 2\n  renderer: NetworkManager"
-      > /target/etc/netplan/01-network-manager-all.yaml
 
     # Remove default filesystem and related tools not used with the suggested 'direct' storage layout.
     # These may yet be required if different partitioning schemes are used.
