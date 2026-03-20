@@ -1,7 +1,8 @@
 #cloud-config
-# See the autoinstall documentation at:
-# https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html
 autoinstall:
+  # https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html
+  # https://rfdonnelly.github.io/working-notes/working-notes/autoinstall-linux.html
+
   version: 1 # version is an Autoinstall required field.
   updates: security
 
@@ -21,17 +22,17 @@ autoinstall:
     install: true
   drivers:
     install: true
-  kernel:
-    package: linux-generic-hwe-24.04
+
+  source:
+    id: ubuntu-desktop-minimal
+    search_drivers: true
 
   packages: # This adds the default ubuntu-desktop packages to the system.
-    - ubuntu-desktop-minimal
     - build-essential
     - git
     - curl
     - vim
     - make
-
 
   snaps: # This adds the default snaps found on a 24.04 Ubuntu Desktop system.
     - name: firefox
@@ -57,12 +58,14 @@ autoinstall:
         match:
           name: "en*"
         dhcp4: true
-    wifis: {} # WiFi configured post-install via GNOME Settings
 
   ssh:
     install-server: true # you're using this as a server too
     authorized-keys:
       - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFYrLGlE1Pw6UzO8zXkcYBdm2PTYqyn7Dxs6TJ/NQALK azayed01@gmail.com"
+
+  oem:
+    install: false
 
   late-commands:
     # Enable the boot splash
@@ -78,9 +81,8 @@ autoinstall:
       printf "network:\n  version: 2\n  renderer: NetworkManager"
       > /target/etc/netplan/01-network-manager-all.yaml
 
-    # Remove default filesystem and related tools not used with the suggested
-    # 'direct' storage layout.  These may yet be required if different
-    # partitioning schemes are used.
+    # Remove default filesystem and related tools not used with the suggested 'direct' storage layout.
+    # These may yet be required if different partitioning schemes are used.
     - >-
       curtin in-target -- apt-get remove -y
       btrfs-progs cryptsetup* lvm2 xfsprogs
@@ -88,6 +90,5 @@ autoinstall:
     # Keep cloud-init, as it performs some of the installation on first boot.
     - curtin in-target -- apt-get install -y cloud-init
 
-    # Finally, remove things only installed as dependencies of other things
-    # we have already removed.
+    # Finally, remove things only installed as dependencies of other things we have already removed.
     - curtin in-target -- apt-get autoremove -y
