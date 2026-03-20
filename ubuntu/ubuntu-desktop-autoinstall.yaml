@@ -41,7 +41,7 @@ autoinstall:
     realname: Aziz Zayed
     username: aziz 
     # A password hash is needed. `openssl passwd -6` can help.
-    password: $6$PMyKKNg0PradabUs$YR352Kk4.7qV85H0u0Sypq9hws9fAYBuAT5njqkX21IAZb9ax2OYAjoSBT60qz2X.13TrPgm1ZqNUnAL4noc71
+    password: "$6$PMyKKNg0PradabUs$YR352Kk4.7qV85H0u0Sypq9hws9fAYBuAT5njqkX21IAZb9ax2OYAjoSBT60qz2X.13TrPgm1ZqNUnAL4noc71"
     hostname: tasneem # The hostname is optional, but it can be set here or configured post-install.
 
   timezone: America/Toronto
@@ -61,6 +61,8 @@ autoinstall:
 
   ssh:
     install-server: true # you're using this as a server too
+    authorized-keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFYrLGlE1Pw6UzO8zXkcYBdm2PTYqyn7Dxs6TJ/NQALK azayed01@gmail.com"
 
   late-commands:
     # Enable the boot splash
