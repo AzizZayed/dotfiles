@@ -26,6 +26,12 @@ autoinstall:
 
   packages: # This adds the default ubuntu-desktop packages to the system.
     - ubuntu-desktop-minimal
+    - build-essential
+    - git
+    - curl
+    - vim
+    - make
+
 
   snaps: # This adds the default snaps found on a 24.04 Ubuntu Desktop system.
     - name: firefox
