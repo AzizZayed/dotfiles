@@ -31,6 +31,32 @@ def pretty_home_path(path: Path) -> str:
         return str(path)
 
 
+def move_to_trash(path: Path) -> None:
+    """Move path to the OS trash/recycle bin without permanently deleting it."""
+    if sys.platform == "darwin":
+        trash_dir = Path.home() / ".Trash"
+    elif sys.platform.startswith("linux"):
+        trash_dir = Path.home() / ".local" / "share" / "Trash" / "files"
+    elif sys.platform == "win32":
+        trash_dir = (
+            Path(os.environ.get("USERPROFILE", "C:\\Users\\Default"))
+            / "AppData"
+            / "Local"
+            / "Temp"
+            / "Trash"
+        )
+    else:
+        panic(f"Unsupported platform for trash: {sys.platform}")
+
+    trash_dir.mkdir(parents=True, exist_ok=True)
+    dest = trash_dir / path.name
+    counter = 1
+    while dest.exists() or dest.is_symlink():
+        dest = trash_dir / f"{path.stem}_{counter}{path.suffix}"
+        counter += 1
+    shutil.move(str(path), str(dest))
+
+
 @dataclass(frozen=True)
 class Link:
     """
@@ -171,7 +197,7 @@ class Manifest:
             print(f"~~ BACKUP  {dst} -> {bkp}")
 
     def delete(self, only: Optional[str] = None):
-        """Delete whatever is at each link's dst so a symlink can be placed there."""
+        """Move whatever is at each link's dst to trash so a symlink can be placed there."""
         for link in self._filtered(only):
             dst = link.dst
             if not dst.exists() and not dst.is_symlink():
@@ -180,11 +206,8 @@ class Manifest:
             if link.exists():
                 print(f"SKIP       {dst} (already linked correctly)")
                 continue
-            if dst.is_dir() and not dst.is_symlink():
-                shutil.rmtree(dst)
-            else:
-                dst.unlink()
-            print(f"xx DELETE  {dst}")
+            move_to_trash(dst)
+            print(f"~~ TRASH   {dst}")
 
 
 def cmd_add(links_file: Path, src: str, dst: str) -> None:
@@ -258,7 +281,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     # delete
-    pd = sub.add_parser("delete", help="Delete files/dirs blocking link destinations")
+    pd = sub.add_parser(
+        "delete", help="Move files/dirs blocking link destinations to trash"
+    )
     pd.add_argument(
         "--only",
         metavar="PATTERN",
@@ -278,20 +303,20 @@ def main(argv: List[str]) -> int:
         return 0
 
     links_json = json.loads(links_file.read_text())
-    manifest = Manifest.from_dict(links_json, repo_dir())
+    links = Manifest.from_dict(links_json, repo_dir())
 
     only = getattr(args, "only", None)
 
     if args.cmd == "status":
-        manifest.status(only)
+        links.status(only)
     elif args.cmd == "install":
-        manifest.install(force_install=args.force, only=only)
+        links.install(force_install=args.force, only=only)
     elif args.cmd == "remove":
-        manifest.remove(only)
+        links.remove(only)
     elif args.cmd == "backup":
-        manifest.backup(only)
+        links.backup(only)
     elif args.cmd == "delete":
-        manifest.delete(only)
+        links.delete(only)
     else:
         panic(f"Unknown command: {args.cmd}")
 
