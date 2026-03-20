@@ -1,0 +1,85 @@
+#cloud-config
+# See the autoinstall documentation at:
+# https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html
+autoinstall:
+  version: 1 # version is an Autoinstall required field.
+  updates: security
+
+  interactive-sections:
+    - storage
+
+  refresh-installer:
+    update: yes
+
+  apt:
+    geoip: true
+    mirror-selection:
+      primary:
+        - country-mirror
+
+  codecs:
+    install: true
+  drivers:
+    install: true
+  kernel:
+    package: linux-generic-hwe-24.04
+
+  packages: # This adds the default ubuntu-desktop packages to the system.
+    - ubuntu-desktop-minimal
+
+  snaps: # This adds the default snaps found on a 24.04 Ubuntu Desktop system.
+    - name: firefox
+      channel: stable
+
+  identity:
+    realname: Aziz Zayed
+    username: aziz 
+    # A password hash is needed. `openssl passwd -6` can help.
+    password: $6$PMyKKNg0PradabUs$YR352Kk4.7qV85H0u0Sypq9hws9fAYBuAT5njqkX21IAZb9ax2OYAjoSBT60qz2X.13TrPgm1ZqNUnAL4noc71
+    hostname: tasneem # The hostname is optional, but it can be set here or configured post-install.
+
+  timezone: America/Toronto
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+    variant: ""
+
+  network:
+    version: 2
+    ethernets:
+      any:
+        match:
+          name: "en*"
+        dhcp4: true
+    wifis: {} # WiFi configured post-install via GNOME Settings
+
+  ssh:
+    install-server: true # you're using this as a server too
+
+  late-commands:
+    # Enable the boot splash
+    - >-
+      curtin in-target --
+      sed -i /etc/default/grub -e
+      's/GRUB_CMDLINE_LINUX_DEFAULT=".*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/'
+    - curtin in-target -- update-grub
+
+    # Let NetworkManager handle network
+    - rm /target/etc/netplan/00-installer-config*yaml
+    - >-
+      printf "network:\n  version: 2\n  renderer: NetworkManager"
+      > /target/etc/netplan/01-network-manager-all.yaml
+
+    # Remove default filesystem and related tools not used with the suggested
+    # 'direct' storage layout.  These may yet be required if different
+    # partitioning schemes are used.
+    - >-
+      curtin in-target -- apt-get remove -y
+      btrfs-progs cryptsetup* lvm2 xfsprogs
+
+    # Keep cloud-init, as it performs some of the installation on first boot.
+    - curtin in-target -- apt-get install -y cloud-init
+
+    # Finally, remove things only installed as dependencies of other things
+    # we have already removed.
+    - curtin in-target -- apt-get autoremove -y

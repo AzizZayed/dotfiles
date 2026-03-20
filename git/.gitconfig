@@ -1,0 +1,9 @@
+[user]
+name = Aziz Zayed
+email = azayed01@gmail.com
+
+[init]
+defaultBranch = main
+
+[core]
+editor = nvim

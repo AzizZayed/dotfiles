@@ -28,7 +28,7 @@ brew install git make cmake
 
 # Other utilities
 echo "Installing other utilities..."
-brew install wget
+brew install wget tree
 brew install --cask font-hack-nerd-font
 
 # Cleanup

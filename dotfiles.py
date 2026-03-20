@@ -1,14 +1,13 @@
-#!/usr/bin/env python3
-
 from __future__ import annotations
 
 import argparse
 import json
 import os
+import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 
 def panic(msg: str, code: int = 1) -> None:
@@ -46,6 +45,7 @@ class Link:
 
     @staticmethod
     def from_dict(d: dict, src_base: Path) -> Link:
+        """Create a Link from a dict with 'src' and 'dst' keys."""
         src = Path(d["src"])  # Provided as absolute or relative to repo
         dst = Path(d["dst"])  # Provided as absolute always
 
@@ -57,16 +57,20 @@ class Link:
         if not src.exists():
             panic(f"Source does not exist: {src}")
 
-        if dst.exists() and not dst.is_symlink():
-            panic(f"Destination already exists and is not a symlink: {dst}")
-
         return Link(src=src, dst=dst)
 
     def create(self):
+        """
+        Create the symlink at dst pointing to src.
+        Panics if dst already exists (either as a file/dir or a symlink) to avoid overwriting anything.
+        """
+        if self.dst.exists() or self.dst.is_symlink():
+            panic(f"Cannot create link, destination already exists: {self.dst}")
         self.dst.parent.mkdir(parents=True, exist_ok=True)
         os.symlink(self.src, self.dst)
 
     def exists(self) -> bool:
+        """Check if the symlink at dst exists (non-dangling symlink) and points to src."""
         return self.dst.is_symlink() and symlink_target(self.dst) == self.src
 
     def is_dir(self) -> bool:
@@ -80,6 +84,10 @@ class Link:
         if self.exists():
             self.dst.unlink()
 
+    def matches(self, pattern: str) -> bool:
+        """Return True if this link's src or dst path contains the given pattern."""
+        return pattern in str(self.src) or pattern in str(self.dst)
+
 
 @dataclass(frozen=True)
 class Manifest:
@@ -92,8 +100,16 @@ class Manifest:
         links = [Link.from_dict(item, src_base) for item in d["links"]]
         return Manifest(links=links)
 
-    def status(self):
-        for link in self.links:
+    def _filtered(self, only: Optional[str]) -> List[Link]:
+        if only is None:
+            return self.links
+        matched = [l for l in self.links if l.matches(only)]
+        if not matched:
+            panic(f"No links matched pattern: {only!r}")
+        return matched
+
+    def status(self, only: Optional[str] = None):
+        for link in self._filtered(only):
             if link.exists():
                 print(f"LINKED     {link.dst} -> {link.src}")
             elif link.dst.is_symlink():  # dst is symlink, but points to wrong target
@@ -103,31 +119,83 @@ class Manifest:
             else:
                 print(f"NOT LINKED {link.dst}")
 
-    def install(self, force_install: bool):
+    def install(self, force_install: bool, only: Optional[str] = None):
         """
-        Create symlinks as declared in the manifest
-        force_install: if True, will remove existing files/links at the destination if they don't point to the source
+        Create symlinks as declared in the manifest.
+        force_install: if True, will remove existing symlinks at dst that don't point to src.
         """
-        for link in self.links:
+        for link in self._filtered(only):
             if link.exists():
                 print(f"SKIP       {link.dst} -> {link.src}")
-            elif not link.dst.is_symlink():  # dst doesn't exist or is not a symlink
+            elif not link.dst.exists() and not link.dst.is_symlink():
                 print(f"++ LINK    {link.dst} -> {link.src}")
                 link.create()
-            elif force_install:
+            elif link.dst.is_symlink() and force_install:
                 tgt = symlink_target(link.dst)
                 print(f"!! RELINK  {link.dst} -> {tgt}, expected -> {link.src})")
                 link.dst.unlink()
                 link.create()
-            else:
+            elif link.dst.is_symlink():
                 tgt = symlink_target(link.dst)
                 print(f"!! SKIP    {link.dst} -> {tgt}, use --force to relink")
+            else:
+                print(
+                    f"!! SKIP    {link.dst} exists and is not a symlink, use 'backup' or 'delete' first"
+                )
 
-    def clean(self):
-        for link in self.links:
+    def remove(self, only: Optional[str] = None):
+        """Remove symlinks that point into this repo."""
+        for link in self._filtered(only):
             if link.exists():
                 print(f"-- REMOVE  {link.dst}")
                 link.remove()
+
+    def backup(self, only: Optional[str] = None):
+        """Copy files/dirs blocking symlink destinations to <dst>.bkp without deleting them."""
+        for link in self._filtered(only):
+            dst = link.dst
+            if not dst.exists() and not dst.is_symlink():
+                print(f"SKIP       {dst} (nothing there)")
+                continue
+            if link.exists():
+                print(f"SKIP       {dst} (already linked correctly)")
+                continue
+            bkp = dst.parent / (dst.name + ".bkp")
+            if bkp.exists():
+                print(f"!! SKIP    {dst} -> backup already exists at {bkp}")
+                continue
+            if dst.is_dir() and not dst.is_symlink():
+                shutil.copytree(dst, bkp)
+            else:
+                shutil.copy2(dst, bkp)
+            print(f"~~ BACKUP  {dst} -> {bkp}")
+
+    def delete(self, only: Optional[str] = None):
+        """Delete whatever is at each link's dst so a symlink can be placed there."""
+        for link in self._filtered(only):
+            dst = link.dst
+            if not dst.exists() and not dst.is_symlink():
+                print(f"SKIP       {dst} (nothing there)")
+                continue
+            if link.exists():
+                print(f"SKIP       {dst} (already linked correctly)")
+                continue
+            if dst.is_dir() and not dst.is_symlink():
+                shutil.rmtree(dst)
+            else:
+                dst.unlink()
+            print(f"xx DELETE  {dst}")
+
+
+def cmd_add(links_file: Path, src: str, dst: str) -> None:
+    """Add a new link entry to the dotfiles.json file."""
+    data = json.loads(links_file.read_text())
+    for entry in data["links"]:
+        if entry["src"] == src and entry["dst"] == dst:
+            panic(f"Entry already exists: {src!r} -> {dst!r}")
+    data["links"].append({"src": src, "dst": dst})
+    links_file.write_text(json.dumps(data, indent=2) + "\n")
+    print(f"++ ADD     {src} -> {dst}")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -143,14 +211,59 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     sub = p.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("status", help="Show link status")
+
+    # add
+    pa = sub.add_parser("add", help="Add a new link entry to dotfiles.json")
+    pa.add_argument("src", help="Source path (relative to repo or absolute)")
+    pa.add_argument("dst", help="Destination path (supports ~)")
+
+    # status
+    ps = sub.add_parser("status", help="Show link status")
+    ps.add_argument(
+        "--only",
+        metavar="PATTERN",
+        help="Filter to links whose src or dst contains PATTERN",
+    )
+
+    # install
     pi = sub.add_parser("install", help="Create/update symlinks")
     pi.add_argument(
         "--force",
         action="store_true",
         help="Relink symlinks pointing to the wrong target",
     )
-    sub.add_parser("clean", help="Remove symlinks that point into this repo")
+    pi.add_argument(
+        "--only",
+        metavar="PATTERN",
+        help="Filter to links whose src or dst contains PATTERN",
+    )
+
+    # remove (renamed from clean)
+    pr = sub.add_parser("remove", help="Remove symlinks that point into this repo")
+    pr.add_argument(
+        "--only",
+        metavar="PATTERN",
+        help="Filter to links whose src or dst contains PATTERN",
+    )
+
+    # backup
+    pb = sub.add_parser(
+        "backup",
+        help="Copy files/dirs blocking link destinations to <dst>.bkp (no deletion)",
+    )
+    pb.add_argument(
+        "--only",
+        metavar="PATTERN",
+        help="Filter to links whose src or dst contains PATTERN",
+    )
+
+    # delete
+    pd = sub.add_parser("delete", help="Delete files/dirs blocking link destinations")
+    pd.add_argument(
+        "--only",
+        metavar="PATTERN",
+        help="Filter to links whose src or dst contains PATTERN",
+    )
 
     return p
 
@@ -159,15 +272,26 @@ def main(argv: List[str]) -> int:
     args = build_parser().parse_args(argv)
 
     links_file = Path(args.links) if args.links else repo_dir() / "dotfiles.json"
+
+    if args.cmd == "add":
+        cmd_add(links_file, args.src, args.dst)
+        return 0
+
     links_json = json.loads(links_file.read_text())
     manifest = Manifest.from_dict(links_json, repo_dir())
 
+    only = getattr(args, "only", None)
+
     if args.cmd == "status":
-        manifest.status()
+        manifest.status(only)
     elif args.cmd == "install":
-        manifest.install(force_install=args.force)
-    elif args.cmd == "clean":
-        manifest.clean()
+        manifest.install(force_install=args.force, only=only)
+    elif args.cmd == "remove":
+        manifest.remove(only)
+    elif args.cmd == "backup":
+        manifest.backup(only)
+    elif args.cmd == "delete":
+        manifest.delete(only)
     else:
         panic(f"Unknown command: {args.cmd}")
 
