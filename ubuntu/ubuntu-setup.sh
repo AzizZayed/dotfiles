@@ -67,11 +67,27 @@ install_shell_tools() {
   local starship_url="https://starship.rs/install.sh"
   local kitty_url="https://sw.kovidgoyal.net/kitty/installer.sh"
 
-  sudo apt install -y bash fish neofetch
+  sudo apt install -y bash neofetch
+
+  # Add fish to the list of valid shells and set it as default
+  if ! command -v fish &>/dev/null; then
+    sudo apt install -y fish
+    if ! grep -q "$(command -v fish)" /etc/shells; then
+      echo "$(command -v fish)" | sudo tee -a /etc/shells
+    else
+      log "Fish already in /etc/shells, skipping"
+    fi
+  fi
 
   # Nushell (no apt package)
   if ! command -v nu &>/dev/null; then
     sudo snap install nushell --classic
+    # Add nushell to the list of valid shells and set it as default
+    if ! grep -q "$(command -v nu)" /etc/shells; then
+      echo "$(command -v nu)" | sudo tee -a /etc/shells
+    else
+      log "Nushell already in /etc/shells, skipping"
+    fi
   fi
 
   # Starship (no apt package, official installer)
