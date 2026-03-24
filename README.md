@@ -15,3 +15,14 @@ python3 dotfiles.py remove # Remove the symlinks of the dotfiles from the destin
 python3 dotfiles.py backup # Backup the dotfiles in the desination location instead of deleting them to install the symlink
 python3 dotfiles.py delete # Delete the dotfiles in the destination location
 ```
+
+## TODO
+
+<!-- TODO: -->
+
+- Add ripgrep to ubuntu installed packages (macos too maybe)
+- Add yazi to ubuntu installed packages (macos too)
+- Add tailscale client to ubuntu installed packages (macos too)
+- Add all path additions and env stuff for used tools so it works without needed to manually do it every install
+- libfontconfig1-dev
+- graphviz

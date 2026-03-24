@@ -81,7 +81,7 @@ install_java() {
 install_node() {
   log "Installing Node.js"
   snap list node &>/dev/null || sudo snap install node --classic
-  sudo apt install -y yarn
+  # sudo apt install -y yarn
 }
 
 install_rust() {
@@ -90,6 +90,7 @@ install_rust() {
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     # shellcheck source=/dev/null
     source "$HOME/.cargo/env"
+    # don't forget .zshrc.local if user is using zsh, and env.nu if using nushell
     grep -qxF 'source $HOME/.cargo/env' "$HOME/.bashrc.local" \
       || echo 'source $HOME/.cargo/env' >> "$HOME/.bashrc.local"
   fi
@@ -167,6 +168,7 @@ install_nvidia() {
   fi
   sudo apt install -y cuda-toolkit-12-8
 
+  # don't forget .zshrc.local if user is using zsh, and env.nu if using nushell
   grep -qxF 'export PATH=/usr/local/cuda/bin:$PATH' "$HOME/.bashrc.local" \
     || echo 'export PATH=/usr/local/cuda/bin:$PATH' >> "$HOME/.bashrc.local"
   grep -qxF 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' "$HOME/.bashrc.local" \
@@ -265,12 +267,11 @@ install_dotfiles() {
 
   if [[ -d "$repo_dir" ]]; then
     log "Dotfiles repo already exists, pulling latest changes"
-    git -C "$repo_dir" pull
-  else
-    git clone "$repo_url" "$repo_dir"
+    git -C "$repo_dir" pull else git clone "$repo_url" "$repo_dir"
   fi
 
   (cd "$repo_dir" && python3 dotfiles.py install --force)
+  git -C "$repo_dir" remote set-url origin "git@github.com:AzizZayed/dotfiles.git"
 }
 
 # == Cleanup ==
@@ -414,6 +415,9 @@ main() {
   install_docker
   install_fonts
   install_dotfiles
+
+  # install devcontainer CLI
+  sudo npm install -g @devcontainers/cli
 
   cleanup
 
